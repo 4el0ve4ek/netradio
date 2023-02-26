@@ -1,0 +1,17 @@
+adminka:
+  port: 8080
+
+auth:
+  port: 8080
+
+broadcast:
+  port: 8080
+
+jwt:
+  secret_key: "secret_key"
+
+news:
+  port: 8080
+
+podcast:
+  port: 8080
