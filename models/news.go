@@ -5,4 +5,5 @@ type News struct {
 	Title           string `json:"title"`
 	PublicationTime int64  `json:"publication_date"`
 	Content         string `json:"content"`
+	Lang            Lang   `json:"lang"`
 }

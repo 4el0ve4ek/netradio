@@ -7,7 +7,7 @@ import (
 
 type Service interface {
 	GetUser(email, password string) (models.User, error)
-	GetUserByUID(uid int) models.User
+	GetUserByUID(uid int) (models.User, error)
 	AddUser(email, password string) (models.User, error)
 	ChangeUserNickname(uid int, name string) error
 	ChangePassword(uid int, password string) error
@@ -51,14 +51,13 @@ func (d *databaseService) AddUser(email, password string) (models.User, error) {
 	}, nil
 }
 
-func (d *databaseService) GetUserByUID(uid int) models.User {
-	return models.User{
-		UID:       uid,
-		Nickname:  "Harrley",
-		PhotoLink: "https://mobimg.b-cdn.net/v3/fetch/00/009384f823da78adb2a30695e4502d5e.jpeg", /// think
-		Lang:      models.Ru,
-		Status:    models.UserRegistered,
+func (d *databaseService) GetUserByUID(uid int) (models.User, error) {
+	for _, user := range d.users {
+		if user.UID == uid {
+			return user, nil
+		}
 	}
+	return models.User{}, errors.New("no such user")
 }
 
 func (d *databaseService) ChangeUserNickname(uid int, name string) error {

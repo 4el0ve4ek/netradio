@@ -23,6 +23,7 @@ type recentHandler struct {
 
 func (h *recentHandler) ServeJSON(context context.Context) (json.RawMessage, error) {
 	newsAll := h.newsService.GetAll()
+
 	sort.Slice(newsAll, func(i, j int) bool {
 		return newsAll[i].PublicationTime > newsAll[j].PublicationTime
 	})

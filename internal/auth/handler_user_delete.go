@@ -21,7 +21,7 @@ type userDeleteHandler struct {
 }
 
 func (h *userDeleteHandler) ServeHTTP(context context.Context) (handles.Response, error) {
-	h.userService.Delete(context.GetUser())
+	h.userService.Delete(context.GetUser().UID)
 
 	resp := handles.Response{
 		Headers: make(http.Header),

@@ -1,14 +1,22 @@
 package music
 
 import (
+	"bufio"
+	"io"
+	"log"
 	"netradio/models"
+	"netradio/pkg/errors"
+	"netradio/pkg/generics/slices"
 	"os"
-	"time"
+)
+
+const (
+	chunkSize = 1 << 20 // 512kb
 )
 
 type Service interface {
 	GetPodcasts() []models.MusicInfo
-	LoadMusic(info models.MusicInfo, dst chan<- []byte) error
+	LoadMusicBatch(info models.MusicInfo) (<-chan []byte, error)
 }
 
 func NewService() *service {
@@ -21,20 +29,32 @@ func (s service) GetPodcasts() []models.MusicInfo {
 	return nil
 }
 
-func (s service) LoadMusic(info models.MusicInfo, dst chan<- []byte) error {
-	fileBytes, err := os.ReadFile("./Rammstein_DU_HAST.mp3")
+func (s service) LoadMusicBatch(info models.MusicInfo) (<-chan []byte, error) {
+	file, err := os.Open("./music.mp3")
 	if err != nil {
-		return err
+		return nil, errors.Wrap(err, "open file")
 	}
-	for len(fileBytes) != 0 {
-		msgSize := 1024
-		if len(fileBytes) < msgSize {
-			msgSize = len(fileBytes)
-		}
+	r := bufio.NewReader(file)
+	chunks := make(chan []byte)
+	go func() {
+		defer close(chunks)
 
-		dst <- fileBytes[:msgSize]
-		fileBytes = fileBytes[msgSize:]
-		time.Sleep(time.Millisecond * 100)
-	}
-	return nil
+		buf := make([]byte, 0, chunkSize)
+		for {
+			n, err := r.Read(buf[:cap(buf)])
+			buf = buf[:n]
+			if n == 0 {
+				if err == nil {
+					continue
+				}
+				if err == io.EOF {
+					break
+				}
+				log.Fatal(err)
+			}
+
+			chunks <- slices.Copy(buf)
+		}
+	}()
+	return chunks, nil
 }

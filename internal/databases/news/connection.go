@@ -20,18 +20,22 @@ func NewService() *databaseService {
 				Title:           "first",
 				PublicationTime: time.Date(2013, 10, 2, 12, 14, 15, 0, time.Local).Unix(),
 				Content:         "",
+				Lang:            "ru",
 			},
 			2: {
 				Title:           "second",
 				PublicationTime: time.Date(2013, 10, 2, 12, 14, 15, 0, time.Local).Unix(),
 				Content:         "content",
+				Lang:            "en",
 			},
 		},
+		ids: 3,
 	}
 }
 
 type databaseService struct {
 	news map[int]models.News
+	ids  int
 }
 
 func (ds *databaseService) GetAll() []models.News {
@@ -50,12 +54,10 @@ func (ds *databaseService) GetByID(id int) (models.News, error) {
 	return newsOne, nil
 }
 
-var ids = 2
-
 func (ds *databaseService) Add(model models.News) int {
 	if model.ID == 0 {
-		model.ID = ids
-		ids++
+		model.ID = ds.ids
+		ds.ids++
 	}
 	ds.news[model.ID] = model
 	return model.ID

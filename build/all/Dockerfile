@@ -11,4 +11,5 @@ RUN go build -o /usr/local/bin/all
 FROM alpine:latest
 COPY --from=builder /usr/local/bin/all ./
 COPY --from=builder /usr/src/app/config.yaml ./config.yaml
+COPY --from=builder /usr/src/app/internal/databases/music/music.mp3 ./music.mp3
 CMD ["./all"]

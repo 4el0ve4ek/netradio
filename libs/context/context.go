@@ -35,12 +35,12 @@ func (c *context) GetUser() models.User {
 	if err != nil {
 		c.logger.Warn(err)
 	}
-
-	return models.User{
-		UID: uid,
-		//Nickname: "Ivan",
-		//Status:   models.UserRegistered,
+	user, err := c.userService.GetUserByUID(uid)
+	if err != nil {
+		c.logger.Warn(err)
 	}
+
+	return user
 }
 
 func (c *context) GetLogger() log.Logger {

@@ -34,10 +34,10 @@ func (h *registerHandler) ServeHTTP(context context.Context) (handles.Response, 
 		return handles.Response{}, err
 	}
 
-	user := h.userService.AddUser(rawUser.Email, rawUser.Password)
+	user, err := h.userService.AddUser(rawUser.Email, rawUser.Password)
 	resp := handles.Response{
 		Headers: make(http.Header),
 	}
 
-	return resp, h.authService.AddUserToHeader(resp.Headers, user)
+	return resp, h.authService.AddUIDToHeader(resp.Headers, user)
 }
