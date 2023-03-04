@@ -20,7 +20,7 @@ type userDeleteHandler struct {
 	verificator jwt.Verificator
 }
 
-func (h *userDeleteHandler) ServeHTTP(context context.Context, request *http.Request) (handles.Response, error) {
+func (h *userDeleteHandler) ServeHTTP(context context.Context) (handles.Response, error) {
 	h.userService.Delete(context.GetUser())
 
 	resp := handles.Response{

@@ -21,23 +21,26 @@ type loginHandler struct {
 	verificator jwt.Verificator
 }
 
-func (h *loginHandler) ServeHTTP(context context.Context, request *http.Request) (handles.Response, error) {
+func (h *loginHandler) ServeHTTP(context context.Context) (handles.Response, error) {
 	var rawUser struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
-	decoder := json.NewDecoder(request.Body)
+	decoder := json.NewDecoder(context.GetRequest().Body)
 	err := decoder.Decode(&rawUser)
 	if err != nil {
 		return handles.Response{}, err
 	}
 
-	user := h.userService.GetUser(rawUser.Email, rawUser.Password)
+	user, err := h.userService.GetUser(rawUser.Email, rawUser.Password)
 	resp := handles.Response{
 		Headers: make(http.Header),
 	}
 
+	if err != nil {
+		return resp, err
+	}
 	err = h.verificator.AddUIDToHeader(resp.Headers, user)
 	return resp, err
 }

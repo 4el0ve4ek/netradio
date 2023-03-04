@@ -2,7 +2,6 @@ package broadcast
 
 import (
 	"encoding/json"
-	"net/http"
 	"netradio/internal/databases/channel"
 	"netradio/libs/context"
 )
@@ -17,6 +16,6 @@ type getterHandler struct {
 	channelService channel.Service
 }
 
-func (h *getterHandler) ServeJSON(context context.Context, r *http.Request) (json.RawMessage, error) {
+func (h *getterHandler) ServeJSON(context context.Context) (json.RawMessage, error) {
 	return nil, nil
 }

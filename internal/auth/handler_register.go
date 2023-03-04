@@ -21,7 +21,8 @@ type registerHandler struct {
 	authService jwt.Verificator
 }
 
-func (h *registerHandler) ServeHTTP(context context.Context, request *http.Request) (handles.Response, error) {
+func (h *registerHandler) ServeHTTP(context context.Context) (handles.Response, error) {
+	request := context.GetRequest()
 	var rawUser struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
@@ -38,5 +39,5 @@ func (h *registerHandler) ServeHTTP(context context.Context, request *http.Reque
 		Headers: make(http.Header),
 	}
 
-	return resp, h.authService.AddUIDToHeader(resp.Headers, user)
+	return resp, h.authService.AddUserToHeader(resp.Headers, user)
 }

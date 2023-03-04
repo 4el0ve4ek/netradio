@@ -3,7 +3,6 @@ package news
 import (
 	"errors"
 	"netradio/models"
-	"netradio/pkg/log"
 	"strconv"
 	"time"
 )
@@ -14,7 +13,7 @@ type Service interface {
 	Add(news models.News) int
 }
 
-func NewService(logger log.Logger) *databaseService {
+func NewService() *databaseService {
 	return &databaseService{
 		news: map[int]models.News{
 			1: {

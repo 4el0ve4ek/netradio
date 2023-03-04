@@ -1,7 +1,6 @@
 package handles
 
 import (
-	"net/http"
 	"netradio/libs/context"
 )
 
@@ -15,8 +14,8 @@ type wrapperJSON struct {
 	original HandlerJSON
 }
 
-func (w *wrapperJSON) ServeHTTP(ctx context.Context, r *http.Request) (Response, error) {
-	res, err := w.original.ServeJSON(ctx, r)
+func (w *wrapperJSON) ServeHTTP(ctx context.Context) (Response, error) {
+	res, err := w.original.ServeJSON(ctx)
 	if err != nil {
 		return Response{}, err
 	}

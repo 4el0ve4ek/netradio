@@ -15,7 +15,7 @@ type refreshHandler struct {
 	authService jwt.Verificator
 }
 
-func (h *refreshHandler) ServeHTTP(context context.Context, request *http.Request) (handles.Response, error) {
+func (h *refreshHandler) ServeHTTP(context context.Context) (handles.Response, error) {
 	user := context.GetUser()
 	resp := handles.Response{
 		Headers: make(http.Header),

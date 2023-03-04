@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
+	"net/http"
 	stdhttp "net/http"
 	"netradio/libs/jwt"
 	"os"
@@ -9,6 +11,8 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+
+	"github.com/go-chi/chi/v5"
 
 	"netradio/cmd/config"
 	"netradio/internal/auth"
@@ -27,11 +31,14 @@ func main() {
 	}
 
 	verificator := jwt.NewVerificator(cfg.Jwt)
-	userService := user.NewService(logger)
+	userService := user.NewService()
 
-	servant := auth.NewHTTPServant(cfg.Auth, logger, verificator, userService)
+	router := chi.NewRouter()
+	auth.RoutePaths(cfg.Auth, router, logger, verificator, userService)
 
-	server := servant.GetServer()
+	server := &http.Server{}
+	server.Addr = fmt.Sprintf(":%d", cfg.Auth.Port)
+	server.Handler = router
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGTERM)

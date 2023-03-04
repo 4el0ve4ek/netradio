@@ -3,7 +3,6 @@ package adminka
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
 	"netradio/internal/databases/news"
 	"netradio/libs/context"
 	"netradio/models"
@@ -11,26 +10,25 @@ import (
 	"time"
 )
 
-func newModifyHandler(newsService news.Service) *modifyHandler {
-	return &modifyHandler{
+func newChangeNewsHandler(newsService news.Service) *changeNewsHandler {
+	return &changeNewsHandler{
 		newsService: newsService,
 	}
 }
 
-type modifyHandler struct {
+type changeNewsHandler struct {
 	newsService news.Service
 }
 
-func (h *modifyHandler) ServeHTTP(context context.Context, request *http.Request) (handles.Response, error) {
+func (h *changeNewsHandler) ServeHTTP(context context.Context) (handles.Response, error) {
 	var rawNews struct {
 		ID      *int    `json:"id,omitempty"`
 		Title   *string `json:"title,omitempty"`
 		Content *string `json:"content,omitempty"`
-
 		//PublicationTime *int64  `json:"publication_date,omitempty"` // <- not allowed to modify
 	}
 
-	decoder := json.NewDecoder(request.Body)
+	decoder := json.NewDecoder(context.GetRequest().Body)
 	err := decoder.Decode(&rawNews)
 
 	if err != nil {
@@ -57,5 +55,6 @@ func (h *modifyHandler) ServeHTTP(context context.Context, request *http.Request
 
 	modifiedNews.PublicationTime = time.Now().Unix()
 	h.newsService.Add(modifiedNews)
+
 	return handles.Response{}, nil
 }

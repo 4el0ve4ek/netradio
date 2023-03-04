@@ -7,9 +7,13 @@ import (
 )
 
 type Handler interface {
-	ServeHTTP(context.Context, *http.Request) (Response, error)
+	ServeHTTP(context.Context) (Response, error)
+}
+
+type HandlerWritable interface {
+	ServeHTTP(context.Context, http.ResponseWriter) error
 }
 
 type HandlerJSON interface {
-	ServeJSON(context context.Context, r *http.Request) (json.RawMessage, error)
+	ServeJSON(context context.Context) (json.RawMessage, error)
 }

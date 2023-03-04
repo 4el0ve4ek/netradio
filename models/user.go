@@ -6,6 +6,8 @@ type User struct {
 	PhotoLink string     `json:"photo"`
 	Lang      Lang       `json:"lang"`
 	Status    UserStatus `json:"status"`
+	Email     string     `json:"email"`
+	Password  string     `json:"-"`
 }
 
 type UserStatus int

@@ -1,6 +1,17 @@
 version: '3'
 
 services:
+  all: # это поднимает все сервисы монолитно
+    image: all:latest
+    build:
+      context: .
+      dockerfile: ./build/all/Dockerfile
+      tags:
+        - adminka:latest
+    container_name: all
+    ports:
+      - "8080:80"
+
   adminka:
     image: adminka:latest
     build:

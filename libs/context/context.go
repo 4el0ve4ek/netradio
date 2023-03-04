@@ -2,6 +2,7 @@ package context
 
 import (
 	"net/http"
+	"netradio/internal/databases/user"
 	"netradio/libs/jwt"
 	"netradio/models"
 	"netradio/pkg/log"
@@ -10,12 +11,14 @@ import (
 type Context interface {
 	GetUser() models.User
 	GetLogger() log.Logger
+	GetRequest() *http.Request
 }
 
-func New(r *http.Request, verificator jwt.Verificator, logger log.Logger) *context {
+func New(r *http.Request, verificator jwt.Verificator, userService user.Service, logger log.Logger) *context {
 	return &context{
 		request:     r,
 		verificator: verificator,
+		userService: userService,
 		logger:      logger,
 	}
 }
@@ -23,6 +26,7 @@ func New(r *http.Request, verificator jwt.Verificator, logger log.Logger) *conte
 type context struct {
 	request     *http.Request
 	verificator jwt.Verificator
+	userService user.Service
 	logger      log.Logger
 }
 
@@ -41,4 +45,8 @@ func (c *context) GetUser() models.User {
 
 func (c *context) GetLogger() log.Logger {
 	return c.logger
+}
+
+func (c *context) GetRequest() *http.Request {
+	return c.request
 }

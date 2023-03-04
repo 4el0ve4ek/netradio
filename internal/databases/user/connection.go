@@ -1,38 +1,54 @@
 package user
 
 import (
+	"errors"
 	"netradio/models"
-	"netradio/pkg/log"
 )
 
 type Service interface {
-	GetUser(email, password string) models.User
-	AddUser(email, password string) models.User
+	GetUser(email, password string) (models.User, error)
+	GetUserByUID(uid int) models.User
+	AddUser(email, password string) (models.User, error)
 	ChangeUserNickname(uid int, name string) error
 	ChangePassword(uid int, password string) error
 	ChangeEmail(uid int, email string) error
-	CreateUser(email, password string, imageID int) error
-	Delete(user models.User)
+	Delete(uid int) error
 }
 
-func NewService(logger log.Logger) *databaseService {
+func NewService() *databaseService {
 	return &databaseService{}
 }
 
-type databaseService struct{}
-
-func (d *databaseService) GetUser(email, password string) models.User {
-	if email == "test" {
-		return d.GetUserByUID(123)
-	}
-	return models.User{}
+type databaseService struct {
+	uids  int
+	users []models.User
 }
 
-func (d *databaseService) AddUser(email, password string) models.User {
-	if email == "test" {
-		return d.GetUserByUID(123)
+func (d *databaseService) GetUser(email, password string) (models.User, error) {
+	for _, user := range d.users {
+		if user.Email == email && user.Password == password {
+			return user, nil
+		}
 	}
-	return models.User{}
+	return models.User{}, errors.New("no such user")
+}
+
+func (d *databaseService) AddUser(email, password string) (models.User, error) {
+	for _, user := range d.users {
+		if user.Email == email {
+			return models.User{}, errors.New("email already used")
+		}
+	}
+	d.uids++
+	return models.User{
+		UID:       d.uids,
+		Nickname:  email,
+		PhotoLink: "",
+		Lang:      models.Ru,
+		Status:    models.UserRegistered,
+		Email:     email,
+		Password:  password,
+	}, nil
 }
 
 func (d *databaseService) GetUserByUID(uid int) models.User {
@@ -46,19 +62,41 @@ func (d *databaseService) GetUserByUID(uid int) models.User {
 }
 
 func (d *databaseService) ChangeUserNickname(uid int, name string) error {
-	return nil
+	for i, user := range d.users {
+		if user.UID == uid {
+			d.users[i].Nickname = name
+			return nil
+		}
+	}
+	return errors.New("no such user")
 }
 
 func (d *databaseService) ChangePassword(uid int, password string) error {
-	return nil
+	for i, user := range d.users {
+		if user.UID == uid {
+			d.users[i].Password = password
+			return nil
+		}
+	}
+	return errors.New("no such user")
 }
 
 func (d *databaseService) ChangeEmail(uid int, email string) error {
-	return nil
+	for i, user := range d.users {
+		if user.UID == uid {
+			d.users[i].Email = email
+			return nil
+		}
+	}
+	return errors.New("no such user")
 }
 
-func (d *databaseService) CreateUser(email, password string, imageID int) error {
-	return nil
+func (d *databaseService) Delete(uid int) error {
+	for i, user := range d.users {
+		if user.UID == uid {
+			d.users = append(d.users[:i], d.users[i+1:]...)
+			return nil
+		}
+	}
+	return errors.New("no such user")
 }
-
-func (d *databaseService) Delete(user models.User) {}

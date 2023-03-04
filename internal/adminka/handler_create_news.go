@@ -2,7 +2,6 @@ package adminka
 
 import (
 	"encoding/json"
-	"net/http"
 	"netradio/internal/databases/news"
 	"netradio/libs/context"
 	"netradio/models"
@@ -10,17 +9,18 @@ import (
 	"time"
 )
 
-func newCreateHandler(newsService news.Service) *createHandler {
-	return &createHandler{
+func newCreateNewsHandler(newsService news.Service) *createNewsHandler {
+	return &createNewsHandler{
 		newsService: newsService,
 	}
 }
 
-type createHandler struct {
+type createNewsHandler struct {
 	newsService news.Service
 }
 
-func (h *createHandler) ServeHTTP(context context.Context, request *http.Request) (handles.Response, error) {
+func (h *createNewsHandler) ServeHTTP(context context.Context) (handles.Response, error) {
+	request := context.GetRequest()
 	var rawNews struct {
 		Title   string `json:"title"`
 		Content string `json:"content"`

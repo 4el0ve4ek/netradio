@@ -2,7 +2,6 @@ package auth
 
 import (
 	"encoding/json"
-	"net/http"
 	"netradio/internal/databases/user"
 	"netradio/libs/context"
 )
@@ -17,6 +16,6 @@ type userGetterHandler struct {
 	userService user.Service
 }
 
-func (h *userGetterHandler) ServeJSON(context context.Context, request *http.Request) (json.RawMessage, error) {
+func (h *userGetterHandler) ServeJSON(context context.Context) (json.RawMessage, error) {
 	return json.Marshal(context.GetUser())
 }

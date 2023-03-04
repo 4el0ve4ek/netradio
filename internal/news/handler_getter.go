@@ -2,7 +2,6 @@ package news
 
 import (
 	"encoding/json"
-	"net/http"
 	"netradio/internal/databases/news"
 	"netradio/libs/context"
 	"strconv"
@@ -20,8 +19,8 @@ type getterHandler struct {
 	newsService news.Service
 }
 
-func (h *getterHandler) ServeJSON(context context.Context, request *http.Request) (json.RawMessage, error) {
-	newsID := chi.URLParam(request, "newsID")
+func (h *getterHandler) ServeJSON(context context.Context) (json.RawMessage, error) {
+	newsID := chi.URLParam(context.GetRequest(), "newsID")
 	id, err := strconv.Atoi(newsID)
 	if err != nil {
 		return nil, err

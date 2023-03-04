@@ -86,7 +86,7 @@ func (a *authVerificator) AddUIDToHeader(header http.Header, user models.User) e
 		return err
 	}
 
-	header.Add(authorizationHeader, authorizationJWTPrefix+" "+jwtSignedValue)
+	header.Set(authorizationHeader, authorizationJWTPrefix+" "+jwtSignedValue)
 	return nil
 }
 

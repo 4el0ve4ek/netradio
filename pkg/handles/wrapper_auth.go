@@ -5,7 +5,7 @@ import (
 	"netradio/libs/context"
 )
 
-func NewAuthWrapper(handler Handler, core Core) *authWrapper {
+func NewAuthWrapper(handler HandlerWritable, core Core) *authWrapper {
 	return &authWrapper{
 		core:     core,
 		original: handler,
@@ -14,35 +14,13 @@ func NewAuthWrapper(handler Handler, core Core) *authWrapper {
 
 type authWrapper struct {
 	core     Core
-	original Handler
+	original HandlerWritable
 }
 
 func (w *authWrapper) ServeHTTP(responseWriter http.ResponseWriter, r *http.Request) {
-	ctx := context.New(r, w.core.auth, w.core.log)
-	response, err := w.original.ServeHTTP(ctx, r)
+	ctx := context.New(r, w.core.auth, w.core.userService, w.core.log)
+	err := w.original.ServeHTTP(ctx, responseWriter)
 
-	for k, v := range response.Headers {
-		if len(v) == 0 {
-			continue
-		}
-		responseWriter.Header().Add(k, v[0])
-	}
-
-	responseWriter.Header().Add("Access-Control-Allow-Origin", "*")
-
-	var statusCode int
-	if err != nil {
-		ctx.GetLogger().Warn(err)
-		statusCode = http.StatusInternalServerError
-	} else {
-		statusCode = response.GetStatusCodeOrDefault(http.StatusOK)
-	}
-	responseWriter.WriteHeader(statusCode)
-
-	if response.Content == nil {
-		return
-	}
-	_, err = responseWriter.Write(response.GetContent())
 	if err != nil {
 		ctx.GetLogger().Warn(err)
 	}
